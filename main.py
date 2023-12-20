@@ -12,7 +12,7 @@ pd.options.mode.chained_assignment = None
 def calculate_cdr_inline(memory, secondary_categories):
     rules={
         1: "f M = 0, CDR = 0 unless there is impairment (0.5 or greater) in two or more secondary categories, in which case CDR = 0.5.",
-        2: "When M = 0.5, CDR = 1 if at least three of the other categories are scored one or greater. Else M = 0.5",
+        2: "When M = 0.5, CDR = 1 if at least three of the other categories are scored one or greater. Else CDR = 0.5",
         3: "CDR = M if at least three secondary categories are given the same score as memory.",
         4: "When three secondary categories are scored on one side of M and two secondary categories are scored on the other side of M, CDR=M.",
         5: "Whenever three or more secondary categories are given a score greater or less than the memory score, CDR = score of majority of secondary categories on whichever side of M has the greater number of secondary categories.",
