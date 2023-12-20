@@ -102,8 +102,20 @@ def calculate_cdr_inline(memory, secondary_categories):
     # Rule 5: CDR = score of the majority of secondary categories on whichever side of M has the
     # greater number of secondary categories
     if (memory > 0.5) & ((lower_side_count > higher_side_count) | (lower_side_count < higher_side_count)):
-        rule=rules[5]
-        return pd.Series(secondary_categories).value_counts(ascending=False).index[0], rule
+
+        serie = pd.Series(secondary_categories).value_counts(ascending=False)
+        categories = serie.index
+        values = serie.values
+
+        if len(categories) == 1:
+            rule = rules[8]
+            return values[0], rule
+        elif values[0] != values[1]:
+            rule = rules[5]
+            return categories[0], rule
+        else:
+            rule = rules[5]
+            return categories[1], rule
     
 
 def calculate_cdr(memory, secondary_categories):
@@ -187,10 +199,21 @@ def calculate_cdr(memory, secondary_categories):
         return memory
 
     # Rule 5: CDR = score of the majority of secondary categories on whichever side of M has the
-    # greater number of secondary categories
+    # greater number of secondary categories... Y rule8
     if (memory > 0.5) & ((lower_side_count > higher_side_count) | (lower_side_count < higher_side_count)):
-        print('Rule 5')
-        return pd.Series(secondary_categories).value_counts(ascending=False).index[0]
+        serie = pd.Series(secondary_categories).value_counts(ascending=False)
+        categories = serie.index
+        values = serie.values
+        
+        if len(categories) == 1:
+            print("Rule 8")
+            return values[0]
+        elif values[0] != values[1]:
+            print("Rule 5")
+            return categories[0]
+        else:
+            print("Rule 5")
+            return categories[1]
 
 st.title("CDR Global calculator.")
 st.subheader("A simple app to calculate the CDR global from the CDR boxes.")
