@@ -20,7 +20,7 @@ def calculate_cdr_inline(memory, secondary_categories):
         7: "Rule 7: With ties in the secondary categories on one side of M, choose the tied scores closest to M for CDR (e.g., M and another secondary category = 3, two secondary categories = 2, and two secondary categories = 1; CDR = 2).",
         8: "Rule 8: When only two secondary categories are given the same score as M, CDR = M as long as no more than two secondary categories are on either side of M."
     }
-# Ultima versión 28/12/23
+# Ultima versión 29/12/23
     from collections import Counter
     # Count the number of secondary categories on each side of memory score
     lower_side_count = sum(score < memory for score in secondary_categories)
@@ -46,7 +46,6 @@ def calculate_cdr_inline(memory, secondary_categories):
     #m 1, box 0.5, 1, 1, 0, 0
     # Check if there are ties
     if (len(ties) == 2) & (memory >= 1):
-    
         if ((ties[0] > memory) & (ties[1] > memory)) | ((ties[0] < memory) & (ties[1] < memory)):
             rule = rules[7]
             serie = pd.Series(secondary_categories).value_counts(ascending=False)
@@ -71,14 +70,14 @@ def calculate_cdr_inline(memory, secondary_categories):
     # Rule 8: When only one or two secondary categories are given the same score as M, CDR = M as long as
     # no more than two secondary categories are on either side of M.
     if ((equal_count == 1) | (equal_count==2)) & (lower_side_count <= 2) & (higher_side_count <=2):
-        rule = rules[8]
+        rule=rules[8]
         return memory, rule
 
 
     # Rule 1: If M = 0, CDR = 0 unless there is impairment (0.5 or greater) in two or more secondary categories,
     # in which case CDR = 0.5.
     if memory == 0:
-        rule = rules[1]
+        rule=rules[1]
         if secondary_categories.count(0.5) + secondary_categories.count(1) + secondary_categories.count(2) + secondary_categories.count(3) >= 2:
             return 0.5, rule
         else:
@@ -97,7 +96,7 @@ def calculate_cdr_inline(memory, secondary_categories):
     ## Count the number of secondary categories equal to memory score
     equal_memory_count = secondary_categories.count(memory)
     if (equal_memory_count >= 3) & (memory>0.5):
-        rule = rules[3]
+        rule=rules[3]
         return memory, rule
     
     # Rule 6: When M = 1 or greater, CDR cannot be 0; in this circumstance, CDR = 0.5 when
@@ -113,7 +112,7 @@ def calculate_cdr_inline(memory, secondary_categories):
         rule=rules[4]
         return memory, rule
     elif (lower_side_count == 3) & (higher_side_count == 2):
-        rules=rule[4]
+        rule=rules[4]
         return memory, rule
 
     # Rule 5: Whenever three or more secondary categories are given a score greater or less than the memory
@@ -121,12 +120,23 @@ def calculate_cdr_inline(memory, secondary_categories):
     # greater number of secondary categories
     if (memory > 0.5) & ((lower_side_count >= 3) | (higher_side_count >= 3)):
         rule=rules[5]
+        print(f"Lower: {lower_side_count}, Upper: {higher_side_count}")
+        print(f"Most frequent category: {pd.Series(secondary_categories).value_counts(ascending=False).index[0]}")
+        print(pd.Series(secondary_categories).value_counts(ascending=False))
         
         serie = pd.Series(secondary_categories).value_counts(ascending=False)
         categories = list(serie.index)
         counts = list(serie.values)
         if len(counts) == 1:
-            return categories[0], rule                
+            return categories[0], rule
+
+        if (len(categories)== 4) & (lower_side_count==3) & (serie.index[0] == memory):
+            sub_serie = serie.drop(memory, axis=0).sort_index(ascending=False).index[0]
+            return sub_serie, rule
+        
+        elif (len(categories)== 4) & (lower_side_count==3) & (serie.index[0] != memory):
+            sub_serie = serie.index[0]
+            return sub_serie, rule             
         
         distance_idx_0 = memory - categories[0]
         distance_idx_1 = memory - categories[1]
@@ -138,8 +148,9 @@ def calculate_cdr_inline(memory, secondary_categories):
         else:
             return 0.5, rule
 
+
         
-# Ultima versión 28/12/23
+# Ultima versión 29/12/23
 def calculate_cdr(memory, secondary_categories):
     """
     memory (int): 0, 0.5, 1, 2
@@ -254,7 +265,15 @@ def calculate_cdr(memory, secondary_categories):
         categories = list(serie.index)
         counts = list(serie.values)
         if len(counts) == 1:
-            return categories[0]                
+            return categories[0]
+
+        if (len(categories)== 4) & (lower_side_count==3) & (serie.index[0] == memory):
+            sub_serie = serie.drop(memory, axis=0).sort_index(ascending=False).index[0]
+            return sub_serie
+        
+        elif (len(categories)== 4) & (lower_side_count==3) & (serie.index[0] != memory):
+            sub_serie = serie.index[0]
+            return sub_serie                
         
         distance_idx_0 = memory - categories[0]
         distance_idx_1 = memory - categories[1]
@@ -265,6 +284,7 @@ def calculate_cdr(memory, secondary_categories):
             return categories[1]
         else:
             return 0.5
+
 
 
 st.title("CDR Global calculator.")
@@ -299,7 +319,7 @@ orientation = st.radio(f"**Orientation**", options=(0, 0.5, 1, 2, 3), index=0, h
 problem = st.radio(f"**Judgment and Problem Solving**", options=(0, 0.5, 1, 2, 3), index=0, horizontal=True)
 community = st.radio(f"**Community Affairs**", options=(0, 0.5, 1, 2, 3), index=0, horizontal=True)
 home = st.radio(f"**Home and Hobbies**", options=(0, 0.5, 1, 2, 3), index=0, horizontal=True)
-care = st.radio(f"**Personal Care**", options=(0, 1, 2, 3), index=0, horizontal=True, help="Persona care can not have 0.5")
+care = st.radio(f"**Personal Care**", options=(0, 1, 2, 3), index=0, horizontal=True, help="Personal care cannot be scored 0.5")
 secondary_categories = [orientation, problem, community, home, care]
 
 cdr_global, rule = calculate_cdr_inline(memory=memory, secondary_categories=secondary_categories)
