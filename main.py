@@ -46,8 +46,8 @@ def calculate_cdr_inline(memory, secondary_categories):
     #m 1, box 0.5, 1, 1, 0, 0
     # Check if there are ties
     if (len(ties) == 2) & (memory >= 1):
+        rule = rules[7]
         if ((ties[0] > memory) & (ties[1] > memory)) | ((ties[0] < memory) & (ties[1] < memory)):
-            rule = rules[7]
             serie = pd.Series(secondary_categories).value_counts(ascending=False)
             categories = list(serie.index)
             counts = list(serie.values)
@@ -66,6 +66,20 @@ def calculate_cdr_inline(memory, secondary_categories):
                 return categories[1], rule
             elif (distance_idx_0 == distance_idx_1):
                 return min(categories[0], categories[1]), rule
+            
+    elif (len(ties) == 2) & (memory == 0):
+        rule = rules[7]
+        if ((ties[0] > memory) & (ties[1] > memory)):
+            serie = pd.Series(secondary_categories).value_counts(ascending=False)
+            categories = list(serie.index)
+            counts = list(serie.values)
+
+            if (categories[0] < categories[1]):
+                return categories[0], rule
+            else:
+                return categories[1], rule
+            
+
             
     # Rule 8: When only one or two secondary categories are given the same score as M, CDR = M as long as
     # no more than two secondary categories are on either side of M.
@@ -204,6 +218,18 @@ def calculate_cdr(memory, secondary_categories):
             elif (distance_idx_0 == distance_idx_1):
                 return min(categories[0], categories[1])
             
+    elif (len(ties) == 2) & (memory == 0):
+        if ((ties[0] > memory) & (ties[1] > memory)):
+            print("Rule 7")
+            serie = pd.Series(secondary_categories).value_counts(ascending=False)
+            categories = list(serie.index)
+            counts = list(serie.values)
+
+            if (categories[0] < categories[1]):
+                return categories[0]
+            else:
+                return categories[1]       
+             
     # Rule 8: When only one or two secondary categories are given the same score as M, CDR = M as long as
     # no more than two secondary categories are on either side of M.
     if ((equal_count == 1) | (equal_count==2)) & (lower_side_count <= 2) & (higher_side_count <=2):
