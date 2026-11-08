@@ -11,7 +11,23 @@ from tkinter import filedialog, font as tkfont, messagebox, ttk
 import cdr_core
 
 APP_TITLE = "CDR Global Calculator"
+APP_VERSION = "2.0.0"
+AUTHOR = "Marcelo A. Maito"
 CONTACT = "mmaito@udesa.edu.ar"
+REPO_URL = "https://github.com/MMarcelo85/Global_cdr_calculator"
+BASE_SIZE = 11  # base font size (pt) for all text; titles are set separately
+
+# Same text as the LICENSE file (checked by tests/test_cdr_core.py).
+LICENSE_TEXT = """MIT License
+
+Copyright (c) 2023 Marcelo A. Maito
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 
 
 def font(size, bold=False):
@@ -21,28 +37,50 @@ def font(size, bold=False):
     return f
 
 
+def text_panel(parent):
+    """Read-only scrollable text area with heading ('h') style. Returns (frame, text, add_link)."""
+    frame = ttk.Frame(parent, padding=16)
+    text = tk.Text(frame, wrap="word", relief="flat", padx=8, pady=8, font=font(BASE_SIZE))
+    text.tag_configure("h", font=font(BASE_SIZE + 1, True))
+    sb = ttk.Scrollbar(frame, orient="vertical", command=text.yview)
+    text.configure(yscrollcommand=sb.set)
+    text.pack(side="left", fill="both", expand=True)
+    sb.pack(side="right", fill="y")
+
+    def add_link(url):
+        tag = f"link{len(text.tag_names())}"
+        text.tag_configure(tag, foreground="#1f4e9c", underline=True)
+        text.tag_bind(tag, "<Button-1>", lambda e: webbrowser.open(url))
+        text.tag_bind(tag, "<Enter>", lambda e: text.config(cursor="hand2"))
+        text.tag_bind(tag, "<Leave>", lambda e: text.config(cursor=""))
+        text.insert("end", url + "\n", tag)
+
+    return frame, text, add_link
+
+
 def build_case_tab(parent):
     frame = ttk.Frame(parent, padding=16)
     ttk.Label(frame, text="Select the score for memory and secondary categories.",
-              font=font(11, True)).grid(row=0, column=0, columnspan=6, sticky="w", pady=(0, 10))
+              font=font(BASE_SIZE + 2, True)).grid(row=0, column=0, columnspan=6, sticky="w", pady=(0, 10))
 
     variables = []
     for row, (key, label) in enumerate(cdr_core.DOMAINS, start=1):
         options = cdr_core.CARE_SCORES if key == "care" else cdr_core.SCORES
         text = label + (" (cannot be 0.5)" if key == "care" else "")
-        ttk.Label(frame, text=text).grid(row=row, column=0, sticky="w", padx=(0, 16), pady=3)
+        ttk.Label(frame, text=text).grid(row=row, column=0, sticky="w", padx=(0, 16), pady=4)
         var = tk.StringVar(value="0")
-        for col, value in enumerate(options, start=1):
+        for value in options:
+            col = cdr_core.SCORES.index(value) + 1  # same column for the same score in every row
             ttk.Radiobutton(frame, text=cdr_core.fmt(value), value=cdr_core.fmt(value), variable=var,
-                            command=lambda: update()).grid(row=row, column=col, sticky="w", padx=6)
+                            command=lambda: update()).grid(row=row, column=col, sticky="w", padx=8)
         variables.append(var)
 
     ttk.Separator(frame).grid(row=8, column=0, columnspan=6, sticky="ew", pady=14)
     score_label = ttk.Label(frame, font=font(18, True), foreground="#1f4e9c")
     score_label.grid(row=9, column=0, columnspan=6, sticky="w")
-    ttk.Label(frame, text="Applied rule:", font=font(10, True)).grid(
+    ttk.Label(frame, text="Applied rule:", font=font(BASE_SIZE + 1, True)).grid(
         row=10, column=0, columnspan=6, sticky="w", pady=(10, 2))
-    rule_label = ttk.Label(frame, wraplength=620, justify="left")
+    rule_label = ttk.Label(frame, wraplength=780, justify="left")
     rule_label.grid(row=11, column=0, columnspan=6, sticky="w")
 
     def update():
@@ -65,11 +103,11 @@ def build_csv_tab(parent):
         f"The results file adds the columns {cdr_core.OUT_SCORE}, {cdr_core.OUT_RULE} and "
         f"{cdr_core.OUT_NOTE} (reason when a row could not be scored). The original file is not modified."
     )
-    ttk.Label(frame, text=instructions, wraplength=680, justify="left").pack(anchor="w")
+    ttk.Label(frame, text=instructions, wraplength=840, justify="left").pack(anchor="w")
 
     buttons = ttk.Frame(frame)
     buttons.pack(anchor="w", pady=10)
-    summary = ttk.Label(frame, wraplength=680, justify="left")
+    summary = ttk.Label(frame, wraplength=840, justify="left")
     summary.pack(anchor="w", pady=(0, 6))
 
     table_frame = ttk.Frame(frame)
@@ -103,7 +141,7 @@ def build_csv_tab(parent):
         tree["columns"] = [str(i) for i in range(len(header))]
         for i, h in enumerate(header):
             tree.heading(str(i), text=h)
-            width = {cdr_core.OUT_RULE: 420, cdr_core.OUT_NOTE: 200, cdr_core.OUT_SCORE: 90}.get(h, 80)
+            width = {cdr_core.OUT_RULE: 500, cdr_core.OUT_NOTE: 240, cdr_core.OUT_SCORE: 110}.get(h, 100)
             tree.column(str(i), width=width, minwidth=60, stretch=False)
         for r in rows:
             tree.insert("", "end", values=r)
@@ -135,16 +173,9 @@ def build_csv_tab(parent):
 
 
 def build_rules_tab(parent):
-    frame = ttk.Frame(parent, padding=16)
-    text = tk.Text(frame, wrap="word", relief="flat", padx=8, pady=8, font=font(10))
-    text.tag_configure("h", font=font(11, True))
-    text.tag_configure("link", foreground="#1f4e9c", underline=True)
-    text.tag_bind("link", "<Button-1>", lambda e: webbrowser.open(cdr_core.RULES_URL))
-    text.tag_bind("link", "<Enter>", lambda e: text.config(cursor="hand2"))
-    text.tag_bind("link", "<Leave>", lambda e: text.config(cursor=""))
-
+    frame, text, add_link = text_panel(parent)
     text.insert("end", "CDR Scoring Rules\n", "h")
-    text.insert("end", cdr_core.RULES_URL + "\n", "link")
+    add_link(cdr_core.RULES_URL)
     text.insert("end", cdr_core.REFERENCE + "\n\n")
     text.insert("end", "Rules:\n", "h")
     for n in range(1, 7):
@@ -155,11 +186,31 @@ def build_rules_tab(parent):
         text.insert("end", f"{n}. {cdr_core.RULES[n].split(': ', 1)[1]}\n\n")
     text.insert("end", f"Please, write to {CONTACT} if you find any scoring errors.\n")
     text.config(state="disabled")
+    return frame
 
-    sb = ttk.Scrollbar(frame, orient="vertical", command=text.yview)
-    text.configure(yscrollcommand=sb.set)
-    text.pack(side="left", fill="both", expand=True)
-    sb.pack(side="right", fill="y")
+
+def build_about_tab(parent):
+    frame, text, add_link = text_panel(parent)
+    text.insert("end", f"{APP_TITLE}\n", "h")
+    text.insert("end", f"Version {APP_VERSION}\n\n")
+    text.insert("end", "Calculates the Clinical Dementia Rating (CDR) Global score from the six CDR boxes "
+                       "using the scoring rules of Morris (1993), shows the rule applied, and scores whole "
+                       "CSV files.\n\n")
+    text.insert("end", f"Author: {AUTHOR}\nContact: {CONTACT}\nSource code and downloads:\n")
+    add_link(REPO_URL)
+    text.insert("end", "\nReference:\n", "h")
+    text.insert("end", cdr_core.REFERENCE + "\n")
+    add_link(cdr_core.RULES_URL)
+    text.insert("end", "\nDisclaimer:\n", "h")
+    text.insert("end", "This tool supports, but does not replace, clinical judgment. The CDR Global must be "
+                       "based on boxes scored by a trained rater. Please report any scoring error to "
+                       f"{CONTACT}.\n\n")
+    text.insert("end", "License:\n", "h")
+    text.insert("end", LICENSE_TEXT + "\n")
+    text.insert("end", "Third-party components:\n", "h")
+    text.insert("end", "This program includes Python (Python Software Foundation License) and Tcl/Tk "
+                       "(BSD-style license), packaged with PyInstaller.\n")
+    text.config(state="disabled")
     return frame
 
 
@@ -172,8 +223,14 @@ def main():
 
     root = tk.Tk()
     root.title(APP_TITLE)
-    root.geometry("780x600")
-    root.minsize(640, 480)
+    root.geometry("940x700")
+    root.minsize(720, 540)
+
+    # Bigger base font for every widget (tabs, labels, buttons, table).
+    for name in ("TkDefaultFont", "TkTextFont", "TkHeadingFont", "TkMenuFont", "TkCaptionFont"):
+        tkfont.nametofont(name).configure(size=BASE_SIZE)
+    row_height = tkfont.nametofont("TkDefaultFont").metrics("linespace") + 8
+    ttk.Style().configure("Treeview", rowheight=row_height)
 
     header = ttk.Frame(root, padding=(16, 12, 16, 0))
     header.pack(fill="x")
@@ -185,6 +242,7 @@ def main():
     notebook.add(build_case_tab(notebook), text="Score a case")
     notebook.add(build_csv_tab(notebook), text="Score a CSV file")
     notebook.add(build_rules_tab(notebook), text="Rules")
+    notebook.add(build_about_tab(notebook), text="About")
 
     root.mainloop()
 

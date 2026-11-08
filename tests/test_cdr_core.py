@@ -73,5 +73,13 @@ class TestCSV(unittest.TestCase):
             cdr_core.process_csv("ID,a,b,c,d,e,f\n1,0,0,0,0,0,0\n")
 
 
+
+class TestAbout(unittest.TestCase):
+    def test_license_text_matches_license_file(self):
+        import desktop_app  # importing tkinter does not need a display
+        with open(os.path.join(os.path.dirname(HERE), "LICENSE"), encoding="utf-8") as f:
+            self.assertEqual(desktop_app.LICENSE_TEXT.strip(), f.read().strip())
+
+
 if __name__ == "__main__":
     unittest.main()
