@@ -10,7 +10,7 @@ Two versions with the same scoring code (`cdr_core.py`):
 * **Web app:** [run it on Streamlit](https://globalcdrcalculator.streamlit.app/) (`main.py`).
 * **Desktop app (Windows / Linux / macOS, no installation, works offline):** download
   `CDR_Global_Calculator_Windows.exe`, `CDR_Global_Calculator_Linux` or the macOS zip from the
-  [Releases page](https://github.com/MMarcelo85/Global_cdr_calculator/releases) and double-click it.
+  [Releases page](https://github.com/MMarcelo85/Global_cdr_calculator/releases/latest) and double-click it.
   * Windows may show "Windows protected your PC" (the program is not digitally signed):
     click **More info → Run anyway**.
   * Linux: the first time, run `chmod +x CDR_Global_Calculator_Linux` (or tick "Allow executing file as program" in Properties).
@@ -60,6 +60,10 @@ and score a whole CSV file.
 * Tests: `python -m unittest discover -s tests` (includes all 12,500 possible score combinations).
 * Run the web app: `pip install -r requirements.txt` then `streamlit run main.py`.
 * Run the desktop app: `python desktop_app.py` (standard library only).
-* Build executables: push a tag (`git tag v2.0.0 && git push origin v2.0.0`) and GitHub Actions
-  builds the Windows, Linux and macOS executables and attaches them to a Release
-  (`.github/workflows/build-desktop.yml`). Local build: `pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py`.
+* New version: update `APP_VERSION` in `desktop_app.py` and the `<release>` line in
+  `packaging/flatpak/io.github.mmarcelo85.CDRGlobalCalculator.metainfo.xml`, commit, then push a tag
+  (`git tag -a v2.0.1 -m "v2.0.1" && git push origin v2.0.1`). GitHub Actions runs the tests, builds the
+  Windows, Linux and macOS executables plus Flatpak and Snap, and attaches them to a Release whose text is
+  `packaging/release_notes.md` (`.github/workflows/build-desktop.yml`).
+* Local build: `pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py`
+  (on macOS: `pyinstaller --windowed --name "CDR Global Calculator" desktop_app.py`).
