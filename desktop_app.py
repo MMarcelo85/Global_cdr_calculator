@@ -1,9 +1,10 @@
-"""CDR Global Calculator - desktop version (Windows / Linux).
+"""CDR Global Calculator - desktop version (Windows / Linux / macOS).
 
 Run:    python desktop_app.py
 Build:  pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py
 """
 import os
+import sys
 import tkinter as tk
 import webbrowser
 from tkinter import filedialog, font as tkfont, messagebox, ttk
@@ -15,7 +16,9 @@ APP_VERSION = "2.0.0"
 AUTHOR = "Marcelo A. Maito"
 CONTACT = "mmaito@udesa.edu.ar"
 REPO_URL = "https://github.com/MMarcelo85/Global_cdr_calculator"
-BASE_SIZE = 11  # base font size (pt) for all text; titles are set separately
+# Base font size (pt) for all text; titles are set separately.
+# macOS draws points smaller (its own default is 13), so it gets a bigger base.
+BASE_SIZE = 14 if sys.platform == "darwin" else 11
 
 # Same text as the LICENSE file (checked by tests/test_cdr_core.py).
 LICENSE_TEXT = """MIT License

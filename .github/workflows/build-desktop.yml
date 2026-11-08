@@ -1,4 +1,4 @@
-# Builds the desktop app: portable Windows .exe and Linux executable, plus Flatpak and Snap packages.
+# Builds the desktop app: portable Windows .exe, Linux executable and macOS .app (zip), plus Flatpak and Snap packages.
 # - Manually: GitHub > Actions > "Build desktop app" > Run workflow (download from the run's Artifacts).
 # - Release: push a tag like v2.0.0; the executables are attached to a GitHub Release.
 name: Build desktop app
@@ -22,6 +22,10 @@ jobs:
           - os: ubuntu-22.04   # older glibc = runs on more Linux distributions
             exe: CDR_Global_Calculator
             asset: CDR_Global_Calculator_Linux
+          - os: macos-latest   # Apple Silicon (M1 and later)
+            asset: CDR_Global_Calculator_macOS_AppleSilicon.zip
+          - os: macos-15-intel # Intel Macs
+            asset: CDR_Global_Calculator_macOS_Intel.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -30,13 +34,25 @@ jobs:
           python-version: "3.12"
       - name: Run tests
         run: python -m unittest discover -s tests -v
-      - name: Build executable
-        run: |
-          python -m pip install pyinstaller
-          pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py
-      - name: Rename
+      - name: Install PyInstaller
+        run: python -m pip install pyinstaller
+      - name: Build executable (Windows / Linux)
+        if: runner.os != 'macOS'
         shell: bash
-        run: mv "dist/${{ matrix.exe }}" "dist/${{ matrix.asset }}"
+        run: |
+          pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py
+          mv "dist/${{ matrix.exe }}" "dist/${{ matrix.asset }}"
+      - name: Build app (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          APP="CDR Global Calculator"
+          pyinstaller --windowed --name "$APP" --osx-bundle-identifier io.github.mmarcelo85.CDRGlobalCalculator desktop_app.py
+          # Smoke test: the app must still be running after 15 s (no crash at startup).
+          "dist/$APP.app/Contents/MacOS/$APP" & PID=$!
+          sleep 15
+          kill -0 $PID && kill $PID
+          # ditto keeps the .app bundle intact (symlinks, signature) inside the zip.
+          ditto -c -k --keepParent "dist/$APP.app" "dist/${{ matrix.asset }}"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}

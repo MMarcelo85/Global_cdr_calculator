@@ -8,12 +8,17 @@
 Two versions with the same scoring code (`cdr_core.py`):
 
 * **Web app:** [run it on Streamlit](https://globalcdrcalculator.streamlit.app/) (`main.py`).
-* **Desktop app (Windows / Linux, no installation, works offline):** download
-  `CDR_Global_Calculator_Windows.exe` or `CDR_Global_Calculator_Linux` from the
+* **Desktop app (Windows / Linux / macOS, no installation, works offline):** download
+  `CDR_Global_Calculator_Windows.exe`, `CDR_Global_Calculator_Linux` or the macOS zip from the
   [Releases page](https://github.com/MMarcelo85/Global_cdr_calculator/releases) and double-click it.
   * Windows may show "Windows protected your PC" (the program is not digitally signed):
     click **More info → Run anyway**.
   * Linux: the first time, run `chmod +x CDR_Global_Calculator_Linux` (or tick "Allow executing file as program" in Properties).
+  * macOS: download `CDR_Global_Calculator_macOS_AppleSilicon.zip` (M1 or later) or
+    `CDR_Global_Calculator_macOS_Intel.zip` (older Intel Macs; Apple menu → About This Mac shows which),
+    double-click the zip and move "CDR Global Calculator" to Applications. The app is not signed by Apple,
+    so the first time macOS blocks it: open it once, then go to **System Settings → Privacy & Security**
+    and click **Open Anyway** (on macOS 14 or older: right-click the app → **Open**).
   * Linux packages (adds the app to the applications menu), also on the Releases page:
     * Flatpak: `flatpak install --user CDR_Global_Calculator.flatpak`
     * Snap: `sudo snap install --dangerous CDR_Global_Calculator.snap`
@@ -53,5 +58,5 @@ and score a whole CSV file.
 * Run the web app: `pip install -r requirements.txt` then `streamlit run main.py`.
 * Run the desktop app: `python desktop_app.py` (standard library only).
 * Build executables: push a tag (`git tag v2.0.0 && git push origin v2.0.0`) and GitHub Actions
-  builds the Windows and Linux executables and attaches them to a Release
+  builds the Windows, Linux and macOS executables and attaches them to a Release
   (`.github/workflows/build-desktop.yml`). Local build: `pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py`.
