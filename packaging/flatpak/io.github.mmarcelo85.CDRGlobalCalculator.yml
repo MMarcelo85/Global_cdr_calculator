@@ -1,0 +1,30 @@
+# Flatpak of the PyInstaller Linux executable (built by .github/workflows/build-desktop.yml).
+app-id: io.github.mmarcelo85.CDRGlobalCalculator
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: cdr-global-calculator
+finish-args:
+  - --share=ipc
+  - --socket=x11          # Tk uses X11 (XWayland on Wayland desktops)
+  - --filesystem=home     # open/save CSV files (Tk file dialogs do not use portals)
+modules:
+  - name: cdr-global-calculator
+    buildsystem: simple
+    build-options:
+      strip: false        # stripping breaks PyInstaller one-file executables
+      no-debuginfo: true
+    build-commands:
+      - install -Dm755 CDR_Global_Calculator_Linux /app/bin/cdr-global-calculator
+      - install -Dm644 io.github.mmarcelo85.CDRGlobalCalculator.desktop /app/share/applications/io.github.mmarcelo85.CDRGlobalCalculator.desktop
+      - install -Dm644 io.github.mmarcelo85.CDRGlobalCalculator.svg /app/share/icons/hicolor/scalable/apps/io.github.mmarcelo85.CDRGlobalCalculator.svg
+      - install -Dm644 io.github.mmarcelo85.CDRGlobalCalculator.metainfo.xml /app/share/metainfo/io.github.mmarcelo85.CDRGlobalCalculator.metainfo.xml
+    sources:
+      - type: file
+        path: ../../dist/CDR_Global_Calculator_Linux
+      - type: file
+        path: io.github.mmarcelo85.CDRGlobalCalculator.desktop
+      - type: file
+        path: io.github.mmarcelo85.CDRGlobalCalculator.svg
+      - type: file
+        path: io.github.mmarcelo85.CDRGlobalCalculator.metainfo.xml

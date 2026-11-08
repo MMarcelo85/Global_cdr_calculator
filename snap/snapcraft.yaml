@@ -1,0 +1,26 @@
+# Snap of the PyInstaller Linux executable (built by .github/workflows/build-desktop.yml).
+name: cdr-global-calculator
+base: core24
+version: '2.0.0'          # replaced by the git tag in the workflow
+summary: Calculate the CDR Global from the CDR boxes (Morris, 1993)
+description: |
+  Scores the Clinical Dementia Rating (CDR) Global from the six CDR boxes using the
+  Morris (1993) scoring rules, shows the rule applied, and scores whole CSV files.
+grade: stable
+confinement: strict
+license: MIT
+platforms:
+  amd64:
+
+apps:
+  cdr-global-calculator:
+    command: bin/cdr-global-calculator
+    extensions: [gnome]   # X11/Wayland, fonts and theme setup
+    plugs: [home, removable-media]
+
+parts:
+  app:
+    plugin: nil
+    source: .
+    override-build: |
+      install -Dm755 dist/CDR_Global_Calculator_Linux "$CRAFT_PART_INSTALL/bin/cdr-global-calculator"

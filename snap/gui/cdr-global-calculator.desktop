@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=CDR Global Calculator
+Comment=Calculate the CDR Global from the CDR boxes (Morris, 1993)
+Exec=cdr-global-calculator
+Icon=${SNAP}/meta/gui/cdr-global-calculator.svg
+Categories=Science;MedicalSoftware;Education;
+Terminal=false

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect x="8" y="8" width="112" height="112" rx="22" fill="#1f4e9c"/>
+  <text x="64" y="62" font-family="DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="bold" fill="#ffffff" text-anchor="middle">CDR</text>
+  <rect x="28" y="78" width="72" height="22" rx="6" fill="#ffffff"/>
+  <text x="64" y="95" font-family="DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1f4e9c" text-anchor="middle">0.5</text>
+</svg>
