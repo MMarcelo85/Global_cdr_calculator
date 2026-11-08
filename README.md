@@ -19,6 +19,9 @@ Two versions with the same scoring code (`cdr_core.py`):
     double-click the zip and move "CDR Global Calculator" to Applications. The app is not signed by Apple,
     so the first time macOS blocks it: open it once, then go to **System Settings → Privacy & Security**
     and click **Open Anyway** (on macOS 14 or older: right-click the app → **Open**).
+    **Note:** the macOS version has not been tested on a real Mac (the author does not have one). It is
+    built automatically and checked to start without errors. If you find a problem, please report it
+    on the [Issues page](https://github.com/MMarcelo85/Global_cdr_calculator/issues).
   * Linux packages (adds the app to the applications menu), also on the Releases page:
     * Flatpak: `flatpak install --user CDR_Global_Calculator.flatpak`
     * Snap: `sudo snap install --dangerous CDR_Global_Calculator.snap`
