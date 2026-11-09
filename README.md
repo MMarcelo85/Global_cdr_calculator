@@ -55,6 +55,15 @@ and score a whole CSV file.
 7. With ties in the secondary categories on one side of M, choose the tied scores closest to M for CDR (e.g., M and another secondary category = 3, two secondary categories = 2, and two secondary categories = 1; CDR = 2).
 8. When only one or two secondary categories are given the same score as M, CDR = M as long as no more than two secondary categories are on either side of M.
 
+### Authorship
+
+Created and maintained by Marcelo A. Maito: original app, implementation of the CDR scoring rules
+(Morris, 1993), testing, and all design decisions. Version 2.0 (shared scoring core, desktop app, tests
+and build workflow) was developed with the assistance of Claude Code (Anthropic), under the author's
+direction and review.
+
+Contact: mmaito@udesa.edu.ar · License: MIT (see `LICENSE`).
+
 ### Development
 
 * Tests: `python -m unittest discover -s tests` (includes all 12,500 possible score combinations).

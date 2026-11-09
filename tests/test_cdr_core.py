@@ -79,6 +79,11 @@ class TestCSV(unittest.TestCase):
 
 
 class TestAbout(unittest.TestCase):
+    def test_authorship_text_matches_readme(self):
+        with open(os.path.join(os.path.dirname(HERE), "README.md"), encoding="utf-8") as f:
+            readme = " ".join(f.read().split())
+        self.assertIn(cdr_core.AUTHORSHIP, readme)
+
     def test_license_text_matches_license_file(self):
         import desktop_app  # importing tkinter does not need a display
         with open(os.path.join(os.path.dirname(HERE), "LICENSE"), encoding="utf-8") as f:

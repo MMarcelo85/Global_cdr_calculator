@@ -201,6 +201,8 @@ def build_about_tab(parent):
                        "CSV files.\n\n")
     text.insert("end", f"Author: {AUTHOR}\nContact: {CONTACT}\nSource code and downloads:\n")
     add_link(REPO_URL)
+    text.insert("end", "\nAuthorship:\n", "h")
+    text.insert("end", cdr_core.AUTHORSHIP + "\n")
     text.insert("end", "\nReference:\n", "h")
     text.insert("end", cdr_core.REFERENCE + "\n")
     add_link(cdr_core.RULES_URL)

@@ -62,3 +62,7 @@ if uploaded_file:
             data=out_csv.encode("utf-8-sig"),
             file_name=f"{name}_CDR_global.csv",
             mime="text/csv")
+
+st.markdown("---")
+st.caption(f"{cdr_core.AUTHORSHIP} Source code and desktop version: "
+           "https://github.com/MMarcelo85/Global_cdr_calculator")
