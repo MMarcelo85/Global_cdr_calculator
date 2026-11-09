@@ -13,5 +13,5 @@
   <launchable type="desktop-id">io.github.mmarcelo85.CDRGlobalCalculator.desktop</launchable>
   <url type="homepage">https://github.com/MMarcelo85/Global_cdr_calculator</url>
   <content_rating type="oars-1.1"/>
-  <releases><release version="2.0.0" date="2026-11-08"/></releases>
+  <releases><release version="2.0.1" date="2026-11-09"/></releases>
 </component>

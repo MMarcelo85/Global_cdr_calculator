@@ -42,12 +42,29 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --name CDR_Global_Calculator desktop_app.py
           mv "dist/${{ matrix.exe }}" "dist/${{ matrix.asset }}"
+      - name: Self-test of the executable (Linux)
+        if: runner.os == 'Linux'
+        run: dist/${{ matrix.asset }} --self-test
+      - name: Self-test and startup test of the executable (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Scoring and CSV checks inside the packaged .exe (exit code 0 = OK).
+          $p = Start-Process -FilePath "dist\${{ matrix.asset }}" -ArgumentList "--self-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Write-Error "Self-test failed"; exit 1 }
+          # Smoke test: the window must still be open after 15 s (no crash at startup).
+          $p = Start-Process -FilePath "dist\${{ matrix.asset }}" -PassThru
+          Start-Sleep -Seconds 15
+          if ($p.HasExited) { Write-Error "App closed at startup"; exit 1 }
+          Stop-Process -Id $p.Id -Force
       - name: Build app (macOS)
         if: runner.os == 'macOS'
         run: |
           APP="CDR Global Calculator"
           pyinstaller --windowed --name "$APP" --osx-bundle-identifier io.github.mmarcelo85.CDRGlobalCalculator desktop_app.py
-          # Smoke test: the app must still be running after 15 s (no crash at startup).
+          # Scoring and CSV checks inside the packaged app, then smoke test:
+          # the app must still be running after 15 s (no crash at startup).
+          "dist/$APP.app/Contents/MacOS/$APP" --self-test
           "dist/$APP.app/Contents/MacOS/$APP" & PID=$!
           sleep 15
           kill -0 $PID && kill $PID

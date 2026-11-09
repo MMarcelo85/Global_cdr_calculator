@@ -60,6 +60,8 @@ and score a whole CSV file.
 * Tests: `python -m unittest discover -s tests` (includes all 12,500 possible score combinations).
 * Run the web app: `pip install -r requirements.txt` then `streamlit run main.py`.
 * Run the desktop app: `python desktop_app.py` (standard library only).
+  `--self-test` checks one case per rule and the CSV handling and exits (0 = OK); the build workflow
+  runs it on the packaged executables, and also checks that the Windows and macOS apps start.
 * New version: update `APP_VERSION` in `desktop_app.py` and the `<release>` line in
   `packaging/flatpak/io.github.mmarcelo85.CDRGlobalCalculator.metainfo.xml`, commit, then push a tag
   (`git tag -a v2.0.1 -m "v2.0.1" && git push origin v2.0.1`). GitHub Actions runs the tests, builds the

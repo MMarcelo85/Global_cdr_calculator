@@ -12,7 +12,7 @@ from tkinter import filedialog, font as tkfont, messagebox, ttk
 import cdr_core
 
 APP_TITLE = "CDR Global Calculator"
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.0.1"
 AUTHOR = "Marcelo A. Maito"
 CONTACT = "mmaito@udesa.edu.ar"
 REPO_URL = "https://github.com/MMarcelo85/Global_cdr_calculator"
@@ -218,6 +218,11 @@ def build_about_tab(parent):
 
 
 def main():
+    if "--self-test" in sys.argv:  # used by the build workflow on the packaged executable
+        failures = cdr_core.self_test()
+        print("\n".join(failures) or "Self-test OK")
+        sys.exit(1 if failures else 0)
+
     try:  # sharp text on high-DPI Windows screens
         import ctypes
         ctypes.windll.shcore.SetProcessDpiAwareness(1)

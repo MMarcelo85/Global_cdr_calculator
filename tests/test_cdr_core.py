@@ -34,6 +34,10 @@ class TestScoring(unittest.TestCase):
         for m, boxes, expected in cases:
             self.assertEqual(cdr_core.calculate_cdr(m, boxes)[0], expected)
 
+    def test_self_test(self):
+        """The checks run on the packaged executable (desktop_app.py --self-test)."""
+        self.assertEqual(cdr_core.self_test(), [])
+
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
             cdr_core.calculate_cdr(1, [0, 0, 0, 0, 0.5])  # personal care cannot be 0.5
